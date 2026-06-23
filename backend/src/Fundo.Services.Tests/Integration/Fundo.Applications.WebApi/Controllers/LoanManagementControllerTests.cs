@@ -1,15 +1,19 @@
-using Microsoft.AspNetCore.Mvc.Testing;
+using Xunit;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Xunit;
+using Microsoft.AspNetCore.Mvc.Testing;
+using System.Net;
+using System.Text.Json;
+using System.Text;
+using Fundo.Applications.WebApi.Dtos;
 
 namespace Fundo.Services.Tests.Integration
 {
-    public class LoanManagementControllerTests : IClassFixture<WebApplicationFactory<Fundo.Applications.WebApi.Startup>>
+    public class LoanManagementControllerTests : IClassFixture<CustomWebApplicationFactory>
     {
         private readonly HttpClient _client;
 
-        public LoanManagementControllerTests(WebApplicationFactory<Fundo.Applications.WebApi.Startup> factory)
+        public LoanManagementControllerTests(CustomWebApplicationFactory factory)
         {
             _client = factory.CreateClient(new WebApplicationFactoryClientOptions
             {
@@ -18,11 +22,31 @@ namespace Fundo.Services.Tests.Integration
         }
 
         [Fact]
-        public async Task GetBalances_ShouldReturnExpectedResult()
+        public async Task GetAllLoans_ReturnsOkAndLoanList()
         {
-            var response = await _client.GetAsync("/loan");
+            var response = await _client.GetAsync("/api/loans");
+            var payload = await response.Content.ReadAsStringAsync();
 
-            Assert.Equal(System.Net.HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Contains("Maria Silva", payload);
+        }
+
+        [Fact]
+        public async Task CreateLoan_ReturnsCreatedLoan()
+        {
+            var request = new CreateLoanRequest
+            {
+                Amount = 1000m,
+                CurrentBalance = 1000m,
+                ApplicantName = "Test User"
+            };
+            var content = new StringContent(JsonSerializer.Serialize(request), Encoding.UTF8, "application/json");
+
+            var response = await _client.PostAsync("/api/loans", content);
+            var payload = await response.Content.ReadAsStringAsync();
+
+            Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+            Assert.Contains("Test User", payload);
         }
     }
 }
