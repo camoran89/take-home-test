@@ -22,7 +22,15 @@ namespace Fundo.Applications.WebApi.Services
             return await _dbContext.Loans
                 .AsNoTracking()
                 .OrderBy(l => l.Id)
-                .Select(ToDto)
+                .Select(l => new LoanDto
+                {
+                    Id = l.Id,
+                    Amount = l.Amount,
+                    CurrentBalance = l.CurrentBalance,
+                    ApplicantName = l.ApplicantName,
+                    Status = l.Status,
+                    PaidAt = l.PaidAt.HasValue ? l.PaidAt.Value.ToString("o") : null
+                })
                 .ToListAsync();
         }
 
@@ -55,9 +63,10 @@ namespace Fundo.Applications.WebApi.Services
                 return null;
             }
 
-            loan.CurrentBalance = decimal.Max(0, loan.CurrentBalance - paymentAmount);
-            if (loan.CurrentBalance == 0)
+            loan.CurrentBalance = loan.CurrentBalance - paymentAmount;
+            if (loan.CurrentBalance <= 0)
             {
+                loan.CurrentBalance = 0m;
                 loan.Status = "paid";
                 loan.PaidAt = System.DateTime.UtcNow;
             }

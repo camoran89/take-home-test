@@ -1,15 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { HttpClientModule } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { catchError, of } from 'rxjs';
-import { Loan } from './loan.model';
-import { LoanService } from './loan.service';
+import { Loan } from '../../loan.model';
+import { LoanService } from '../../loan.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, HttpClientModule],
+  imports: [CommonModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })

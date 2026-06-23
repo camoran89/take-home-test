@@ -1,9 +1,9 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from '../environments/environment';
-import { Loan } from './loan.model';
-import { CreateLoanPayload } from './loan-payload';
+import { Loan } from '../models/models';
+import { CreateLoanPayload } from '../payloads/payloads';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',

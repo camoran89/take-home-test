@@ -1,5 +1,6 @@
 using Fundo.Applications.WebApi.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 
 namespace Fundo.Applications.WebApi.Data
 {
