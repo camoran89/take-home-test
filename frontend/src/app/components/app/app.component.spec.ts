@@ -2,9 +2,9 @@
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
-import { LoanService } from './loan.service';
+import { LoanService } from '../../services/loan.service';
 import { of } from 'rxjs';
-import { Loan } from './loan.model';
+import { Loan } from '../../loan.model';
 
 describe('AppComponent', () => {
   let fixture: ComponentFixture<AppComponent>;
