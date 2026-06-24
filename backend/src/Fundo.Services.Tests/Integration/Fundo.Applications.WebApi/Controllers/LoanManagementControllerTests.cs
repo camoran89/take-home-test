@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net;
 using System.Text.Json;
 using System.Text;
+using System.Net.Http.Headers;
 using Fundo.Applications.WebApi.Dtos;
 
 namespace Fundo.Services.Tests.Integration
@@ -19,6 +20,28 @@ namespace Fundo.Services.Tests.Integration
             {
                 AllowAutoRedirect = false
             });
+
+            AuthenticateClientAsync().GetAwaiter().GetResult();
+        }
+
+        private async Task AuthenticateClientAsync()
+        {
+            var authRequest = new AuthRequest
+            {
+                Username = "testuser",
+                Password = "Password123"
+            };
+            var content = new StringContent(JsonSerializer.Serialize(authRequest), Encoding.UTF8, "application/json");
+            var response = await _client.PostAsync("/api/auth/login", content);
+            response.EnsureSuccessStatusCode();
+
+            var payload = await response.Content.ReadAsStringAsync();
+            using var document = JsonDocument.Parse(payload);
+            var token = document.RootElement.GetProperty("token").GetString();
+            if (!string.IsNullOrEmpty(token))
+            {
+                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
         }
 
         [Fact]
