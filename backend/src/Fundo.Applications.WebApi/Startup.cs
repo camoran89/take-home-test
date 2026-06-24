@@ -54,11 +54,11 @@ namespace Fundo.Applications.WebApi
             services.AddScoped<ILoanService, LoanService>();
             services.AddSingleton<ITokenService, JwtTokenService>();
 
-            var jwtKey = _configuration["Jwt:Key"];
-            var jwtIssuer = _configuration["Jwt:Issuer"];
-            var jwtAudience = _configuration["Jwt:Audience"];
+            var jwtKey = _configuration["Jwt:Key"] ?? "ThisIsASecretJwtSigningKeyForLocalDevelopment123!";
+            var jwtIssuer = _configuration["Jwt:Issuer"] ?? "Fundo.Api";
+            var jwtAudience = _configuration["Jwt:Audience"] ?? "Fundo.Client";
 
-            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey ?? string.Empty));
+            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>

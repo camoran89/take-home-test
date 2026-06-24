@@ -16,7 +16,7 @@ namespace Fundo.Applications.WebApi.Services
 
         public JwtTokenService(IConfiguration configuration)
         {
-            _key = configuration["Jwt:Key"] ?? throw new ArgumentNullException("Jwt:Key");
+            _key = configuration["Jwt:Key"] ?? "ThisIsASecretJwtSigningKeyForLocalDevelopment123!";
             _issuer = configuration["Jwt:Issuer"] ?? "Fundo.Api";
             _audience = configuration["Jwt:Audience"] ?? "Fundo.Client";
             _expiresMinutes = int.TryParse(configuration["Jwt:ExpiresMinutes"], out var value) ? value : 60;
