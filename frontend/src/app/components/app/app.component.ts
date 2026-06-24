@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { catchError, of } from 'rxjs';
-import { Loan } from '../../loan.model';
-import { LoanService } from '../../loan.service';
+import { Loan } from '../../models/models';
+import { LoanService } from '../../services/loan.service';
 
 @Component({
   selector: 'app-root',

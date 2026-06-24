@@ -4,7 +4,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { AppComponent } from './app.component';
 import { LoanService } from '../../services/loan.service';
 import { of } from 'rxjs';
-import { Loan } from '../../loan.model';
+import { Loan } from '../../models/models';
 
 describe('AppComponent', () => {
   let fixture: ComponentFixture<AppComponent>;
