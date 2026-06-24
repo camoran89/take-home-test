@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Fundo.Services.Tests.Integration
 {
@@ -40,14 +41,18 @@ namespace Fundo.Services.Tests.Integration
                 {
                     options.UseInMemoryDatabase("LoanManagementTests");
                 });
-
-                var sp = services.BuildServiceProvider();
-                using var scope = sp.CreateScope();
-                var db = scope.ServiceProvider.GetRequiredService<LoanDbContext>();
-                db.Database.EnsureCreated();
             });
 
-            return base.CreateHost(builder);
+            var host = base.CreateHost(builder);
+            InitializeDatabaseAsync(host.Services).GetAwaiter().GetResult();
+            return host;
+        }
+
+        private static async Task InitializeDatabaseAsync(IServiceProvider services)
+        {
+            await using var scope = services.CreateAsyncScope();
+            var db = scope.ServiceProvider.GetRequiredService<LoanDbContext>();
+            await db.Database.EnsureCreatedAsync();
         }
 
         private static string GetProjectPath()
