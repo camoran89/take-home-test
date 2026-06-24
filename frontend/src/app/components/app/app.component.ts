@@ -1,20 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { catchError, of } from 'rxjs';
-import { Loan } from './loan.model';
-import { LoanService } from './loan.service';
-import { AuthService } from './services/auth.service';
-import { AuthInterceptor } from './interceptors/auth.interceptor';
+import { Loan } from '../../models/models';
+import { LoanService } from '../../services/loan.service';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CommonModule, HttpClientModule],
-  providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
-  ],
+  imports: [CommonModule],
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
@@ -28,54 +22,10 @@ export class AppComponent {
   createError = signal('');
   createLoading = signal(false);
   paymentLoading = signal<number | null>(null);
-  loginUsername = signal('');
-  loginPassword = signal('');
-  loginError = signal('');
-  loginLoading = signal(false);
-  authService = inject(AuthService);
   loanService = inject(LoanService);
-  isAuthenticated = computed(() => this.authService.isAuthenticated);
 
   constructor() {
-    if (this.isAuthenticated()) {
-      this.loadLoans();
-    }
-  }
-
-  login(): void {
-    this.loginError.set('');
-    const username = this.loginUsername().trim();
-    const password = this.loginPassword().trim();
-
-    if (!username || !password) {
-      this.loginError.set('Username and password are required.');
-      return;
-    }
-
-    this.loginLoading.set(true);
-
-    this.authService
-      .login({ username, password })
-      .pipe(
-        catchError(() => {
-          this.loginError.set('Login failed. Please verify your credentials.');
-          this.loginLoading.set(false);
-          return of(null);
-        })
-      )
-      .subscribe((result) => {
-        this.loginLoading.set(false);
-        if (result) {
-          this.loadLoans();
-        }
-      });
-  }
-
-  logout(): void {
-    this.authService.logout();
-    this.loans.set([]);
-    this.loginUsername.set('');
-    this.loginPassword.set('');
+    this.loadLoans();
   }
 
   loadLoans(): void {
@@ -85,7 +35,7 @@ export class AppComponent {
     this.loanService
       .getLoans()
       .pipe(
-        catchError(() => {
+        catchError((err) => {
           this.error.set('Unable to load loans. Please check the backend connection.');
           this.loading.set(false);
           return of([] as Loan[]);

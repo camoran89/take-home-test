@@ -1,33 +1,90 @@
 <main class="loans">
   <section class="loans--container">
     <h1>Loan Management</h1>
-    <table mat-table [dataSource]="loans" class="mat-elevation-z8">
-      <ng-container matColumnDef="loanAmount">
-        <th mat-header-cell *matHeaderCellDef>Loan Amount</th>
-        <td mat-cell *matCellDef="let element">
-          {{ element.loanAmount | currency }}
-        </td>
-      </ng-container>
 
-      <ng-container matColumnDef="currentBalance">
-        <th mat-header-cell *matHeaderCellDef>Current Balance</th>
-        <td mat-cell *matCellDef="let element">
-          {{ element.currentBalance | currency }}
-        </td>
-      </ng-container>
+    @if (!isAuthenticated()) {
+      <div class="login-card">
+        <h2>Login</h2>
+        <div class="form-row">
+          <label>
+            Username
+            <input type="text" [value]="loginUsername()" (input)="loginUsername.set($any($event.target).value)" />
+          </label>
+          <label>
+            Password
+            <input type="password" [value]="loginPassword()" (input)="loginPassword.set($any($event.target).value)" />
+          </label>
+          <button type="button" (click)="login()" [disabled]="loginLoading()">Login</button>
+        </div>
+        @if (loginError()) {
+          <div class="status-message error">{{ loginError() }}</div>
+        }
+      </div>
+    }
 
-      <ng-container matColumnDef="applicant">
-        <th mat-header-cell *matHeaderCellDef>Applicant</th>
-        <td mat-cell *matCellDef="let element">{{ element.applicant }}</td>
-      </ng-container>
+    @if (isAuthenticated()) {
+      <div class="toolbar">
+        <button type="button" (click)="logout()">Logout</button>
+      </div>
 
-      <ng-container matColumnDef="status">
-        <th mat-header-cell *matHeaderCellDef>Status</th>
-        <td mat-cell *matCellDef="let element">{{ element.status }}</td>
-      </ng-container>
+      @if (loading()) {
+        <div class="status-message">Loading loans…</div>
+      }
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-    </table>
+      @if (error()) {
+        <div class="status-message error">{{ error() }}</div>
+      }
+
+      @if (!loading() && !error()) {
+        <div class="loan-actions">
+          <h2>Create Loan</h2>
+          <div class="form-row">
+            <label>
+              Applicant
+              <input type="text" [value]="createApplicant()" (input)="createApplicant.set($any($event.target).value)" />
+            </label>
+            <label>
+              Amount
+              <input type="number" [value]="createAmount()" (input)="createAmount.set($any($event.target).valueAsNumber)" />
+            </label>
+            <label>
+              Current Balance
+              <input type="number" [value]="createBalance()" (input)="createBalance.set($any($event.target).valueAsNumber)" />
+            </label>
+            <button type="button" (click)="createLoan()" [disabled]="createLoading()">Create</button>
+          </div>
+          @if (createError()) {
+            <div class="status-message error">{{ createError() }}</div>
+          }
+        </div>
+
+        <table class="mat-elevation-z8 loans-table">
+          <thead>
+            <tr>
+              <th>Loan Amount</th>
+              <th>Current Balance</th>
+              <th>Applicant</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (let loan of loans()) {
+              <tr>
+                <td>{{ loan.amount | currency }}</td>
+                <td>{{ loan.currentBalance | currency }}</td>
+                <td>{{ loan.applicantName }}</td>
+                <td>{{ loan.status }}</td>
+                <td>
+                  @if (loan.status === 'active') {
+                    <button type="button" (click)="makePayment(loan.id, 50)" [disabled]="paymentLoading() === loan.id">Pay 50</button>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      }
+    }
   </section>
 </main>

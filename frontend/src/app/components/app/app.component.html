@@ -1,0 +1,64 @@
+<main class="loans">
+  <section class="loans--container">
+    <h1>Loan Management</h1>
+
+    @if (loading()) {
+      <div class="status-message">Loading loans…</div>
+    }
+
+    @if (error()) {
+      <div class="status-message error">{{ error() }}</div>
+    }
+
+    @if (!loading() && !error()) {
+      <div class="loan-actions">
+        <h2>Create Loan</h2>
+        <div class="form-row">
+          <label>
+            Applicant
+            <input type="text" [value]="createApplicant()" (input)="createApplicant.set($any($event.target).value)" />
+          </label>
+          <label>
+            Amount
+            <input type="number" [value]="createAmount()" (input)="createAmount.set($any($event.target).valueAsNumber)" />
+          </label>
+          <label>
+            Current Balance
+            <input type="number" [value]="createBalance()" (input)="createBalance.set($any($event.target).valueAsNumber)" />
+          </label>
+          <button type="button" (click)="createLoan()" [disabled]="createLoading()">Create</button>
+        </div>
+        @if (createError()) {
+          <div class="status-message error">{{ createError() }}</div>
+        }
+      </div>
+
+      <table class="mat-elevation-z8 loans-table">
+        <thead>
+          <tr>
+            <th>Loan Amount</th>
+            <th>Current Balance</th>
+            <th>Applicant</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (let loan of loans()) {
+            <tr>
+              <td>{{ loan.amount | currency }}</td>
+              <td>{{ loan.currentBalance | currency }}</td>
+              <td>{{ loan.applicantName }}</td>
+              <td>{{ loan.status }}</td>
+              <td>
+                @if (loan.status === 'active') {
+                  <button type="button" (click)="makePayment(loan.id, 50)" [disabled]="paymentLoading() === loan.id">Pay 50</button>
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </section>
+</main>

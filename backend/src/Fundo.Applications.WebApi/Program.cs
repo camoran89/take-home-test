@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
+using Serilog;
+using Serilog.Formatting.Json;
 using System;
 
 namespace Fundo.Applications.WebApi
@@ -8,23 +10,30 @@ namespace Fundo.Applications.WebApi
     {
         public static void Main(string[] args)
         {
+            Log.Logger = new LoggerConfiguration()
+                .Enrich.FromLogContext()
+                .WriteTo.Console(new JsonFormatter())
+                .MinimumLevel.Information()
+                .CreateLogger();
+
             try
             {
                 CreateWebHostBuilder(args).Build().Run();
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Unhandled WebApi exception: {ex.Message}");
+                Log.Fatal(ex, "Application start-up failed");
             }
             finally
             {
-                Console.WriteLine("Application shutting down.");
+                Log.CloseAndFlush();
             }
         }
 
         public static IWebHostBuilder CreateWebHostBuilder(string[] args)
         {
             return WebHost.CreateDefaultBuilder(args)
+                .UseSerilog()
                 .UseStartup<Startup>();
         }
     }
